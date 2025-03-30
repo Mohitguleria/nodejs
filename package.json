@@ -4,12 +4,15 @@
   "description": "This is the customers project developed in node.js",
   "main": "src/app.js",
   "scripts": {
-    "start": "node --watch src/app.js"
+    "start": "npx nodemon"
   },
   "author": "Mohit Guleria",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "mongoose": "^8.13.1",
+    "nodemon": "^3.1.9",
     "uuid": "^11.1.0"
   }
 }

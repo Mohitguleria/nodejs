@@ -1,13 +1,53 @@
-const {v4: uuidv4} = require('uuid')
-const http = require('http');
-const server = http.createServer((req, res) => {
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/html')
-    res.end('<h1>Customers App</h1>')
+const express = require('express')
+const mongoose = require('mongoose')
+const dotenv = require('dotenv')
+
+const app = express()
+
+mongoose.set('strictQuery', false)
+
+app.use(express.json())
+app.use(express.urlencoded({extended: true}))
+
+if(process.env.NODE_ENV !== 'production'){
+    dotenv.config()
+}
+
+const PORT = process.env.PORT || 8000;
+const CONNECTION = process.env.CONNECTION;
+const customers = [
+    {"name": "Mohit Guleria", industry: "IT Industry" },
+    {"name": "Montie", industry: "Spiritual Industry" },
+    {"name": "MonT", industry: "Beauty Industry" }
+]
+
+app.get('/', (req, res) => {
+    res.send('<script> function redirect(){window.location.href = "/post"}</script><h1>Customers Express App</h1><button onclick="redirect()">Post request</button>')
 })
 
-server.listen(3000, '127.0.0.1', () => {
-    console.log("uuid v4", uuidv4())
-    console.log("Server is running on port 3000")
-
+app.get('/api/customers', (req, res) => {
+    res.send({"customers": customers})
 })
+
+app.post('/', (req, res) => {
+    res.send("Plain text")
+})
+
+app.post('/api/customers', (req, res) => {
+    console.log("req.body", req.body)
+    res.send(req.body);
+})
+
+const start = async() => {
+    try{
+        await mongoose.connect(CONNECTION);
+        app.listen(PORT, () => {
+            console.log("Server is running on port " + PORT)
+        })
+    }
+    catch(error){
+        console.log("Error: ", error.message)
+    }
+}
+
+start();
