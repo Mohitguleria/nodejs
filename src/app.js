@@ -1,6 +1,7 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const dotenv = require('dotenv')
+const Customer = require('./models/customer')
 
 const app = express()
 
@@ -21,21 +22,42 @@ const customers = [
     {"name": "MonT", industry: "Beauty Industry" }
 ]
 
-app.get('/', (req, res) => {
-    res.send('<script> function redirect(){window.location.href = "/post"}</script><h1>Customers Express App</h1><button onclick="redirect()">Post request</button>')
+const customer = new Customer({
+    name: "Mohit",
+    industry: "Varied"
 })
 
-app.get('/api/customers', (req, res) => {
-    res.send({"customers": customers})
+// customer.save();
+
+app.get('/', (req, res) => {
+    // res.send('<script> function redirect(){window.location.href = "/post"}</script><h1>Customers Express App</h1><button onclick="redirect()">Post request</button>')
+    res.send(customer)
+})
+
+app.get('/api/customers', async (req, res) => {
+    // console.log(await mongoose.connection.db.listCollections().toArray())
+    try {
+        const result = await Customer.find()
+        res.send({"customers": result})
+    } catch(error){
+        res.status(500).json({error: error.message})
+    }
 })
 
 app.post('/', (req, res) => {
     res.send("Plain text")
 })
 
-app.post('/api/customers', (req, res) => {
+app.post('/api/customers', async (req, res) => {
     console.log("req.body", req.body)
-    res.send(req.body);
+    const customer = new Customer(req.body)
+    try{
+        await customer.save();
+        res.status(201).json({customer}); // 201 is the code for creation
+    }
+    catch(e) {
+        res.status(400).json({error: e})
+    }
 })
 
 const start = async() => {
